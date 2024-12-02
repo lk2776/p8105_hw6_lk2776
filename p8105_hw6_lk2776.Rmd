@@ -16,7 +16,11 @@ library(SemiPar)
 #problem2
 data = read_csv("./data/homicide-data.csv") |>
   janitor::clean_names() |>
-  drop_na()
+  drop_na() |>
+  mutate(city_state = paste(city, state, sep="_"), 
+         not_solved = if_else(
+           disposition %in% c("Closed without arrest", "Open/No arrest"), 1, 0)) |>
+ filter(!city_state %in% c("Tulsa_AL","Dallas_TX","Phoenix_AZ","Kansas City_MO")) 
 ```
 
 ```{r}
