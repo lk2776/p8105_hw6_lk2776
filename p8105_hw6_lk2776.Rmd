@@ -19,20 +19,20 @@ data = read_csv("./data/homicide-data.csv", na=c("Unknown",".",""), ) |>
   drop_na() |>
   mutate(city_state = paste(city, state, sep="_"), 
          status = if_else(
-           disposition %in% c("Closed without arrest", "Open/No arrest"), "resolved", "unresolved")) |>
+           disposition %in% c("Closed without arrest", "Open/No arrest"), "1", "0")) |>
  filter(!city_state %in% c("Tulsa_AL","Dallas_TX","Phoenix_AZ","Kansas City_MO")) |>
   filter(victim_race %in% c("White","Black")) |>
-  mutate(victim_age = as.numeric(victim_age))
+  mutate(victim_age = as.numeric(victim_age), 
+         status = as.numeric(status))
 
-baltimore_df = data |>
-  filter(city_state = "Baltimore_MD") 
+baltimore_data = data |>
+  filter(city_state == "Baltimore_MD") 
 ```
 
 ```{r}
 fit_logistic =
-  baltimore_df |>
-  glm(status ~ victim_age + victim_race + victim_se
-x, data = _, family = binomial())
+  baltimore_data |>
+  glm(status ~ victim_age + victim_race + victim_sex, data = _, family = binomial())
 ```
 
 
@@ -56,5 +56,9 @@ fit_logistic |>
   mutate(OR = exp(estimate)) |>
   select(term, log_OR = estimate, OR, p.value) |>
   knitr::kable(digits = 3)
+
+baltimore_df |>
+  modelr::add_predictions(fit_logistic) |>
+  mutate(fitted_prob = boot::inv.logit(pred))
 ```
 
