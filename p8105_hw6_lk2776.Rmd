@@ -12,3 +12,14 @@ library(mgcv)
 library(SemiPar)
 ```
 
+```{r}
+#problem2
+data = read_csv("./data/homicide-data.csv") |>
+  janitor::clean_names() |>
+  drop_na()
+```
+
+```{r}
+
+```
+
