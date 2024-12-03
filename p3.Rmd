@@ -55,6 +55,17 @@ model_1 = lm(bwt ~ babysex + bhead + blength + delwt + fincome + frace + gaweeks
   select(term, estimate, p.value) 
 
 
+fit_null = lm(price ~ stars + borough, data = nyc_air
+bnb)
+fit_alt = lm(price ~ stars + borough + room_type, dat
+a = nyc_airbnb)
+
+anova(fit_null, fit_alt) |>
+  broom::tidy()
+bwt_data = bwt_data |>
+add_predictions(model_1) |>
+  add_residuals(model_1)
+
 model_1 |> 
   broom::tidy() |>
   select(term, estimate, p.value) 
