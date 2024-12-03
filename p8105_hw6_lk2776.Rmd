@@ -6,10 +6,27 @@ date: "2024-12-02"
 
 ```{r}
 library(tidyverse)
+library(ggplot2)
 library(p8105.datasets)
 library(modelr)
 library(mgcv)
 library(SemiPar)
+
+#R figure settings
+knitr::opts_chunk$set(
+  fig.width = 9,
+  fig.asp = .6,
+  out.width = "90%"
+)
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
 ```
 
 ```{r}
@@ -34,14 +51,23 @@ baltimore_data = data |>
 
 fit_logistic =
   baltimore_data |>
-  glm(status ~ victim_age + victim_race + victim_sex, data = _, family = binomial()) 
-  
-fit_logistic |>
+  glm(status ~ victim_age + victim_race + victim_sex, data = _, family = binomial()) |>
   broom::tidy(conf.int=TRUE) |>
   mutate(OR = exp(estimate)) |>
   select(term, log_OR = estimate, OR, conf.low,conf.high,p.value) |>
-  filter(term == "victim_sexMale") #|>
+  filter(term == "victim_sexMale")
+  
+#fit_logistic |> knitr::kable()
 
+```
+
+
+```{r}
+ggplot(all_cities_fit_logistic, aes(x= city_state, y = log_OR)) + 
+  geom_point() +
+  theme(axis.text.x = element_text(angle = 80, hjust
+= 1))
+  
 ```
 
 ```{r}
@@ -57,8 +83,12 @@ all_cities_fit_logistic = data |>
   select(term, log_OR = estimate, OR, conf.low,conf.high,p.value) |>
   filter(term == "victim_sexMale") 
 
-all_cities_fit_logistic |> #knitr::kable()
+#all_cities_fit_logistic |> knitr::kable()
   
+```
+
+
+```{r}
 
 
   map(glm(status ~ victim_age + victim_race + victim_sex, data = _, family = binomial()) 
@@ -93,6 +123,8 @@ fit_logistic_all |>
   #knitr::kable()
 
 ```
+
+
 
 ```{r}
 baltimore_df =
