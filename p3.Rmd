@@ -39,12 +39,16 @@ bwt_data = read_csv("./data/birthweight.csv", na=c(" ",".","")) |>
   drop_na() |>
   mutate(
     babysex = as.factor(babysex),
+    malform = as.factor(malform)
     frace = as.factor(frace),
     mrace = as.factor(frace)
   )
-
-
 #str(bwt_data)
 
+```
+
+```{r}
+lm_model = lm(bwt ~ babysex + bhead + blength + delwt + fincome + frace + gaweeks + malform
+              mrace + smoken)
 ```
 
