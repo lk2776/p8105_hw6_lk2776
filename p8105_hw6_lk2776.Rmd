@@ -45,14 +45,20 @@ fit_logistic |>
 ```
 
 ```{r}
-#all cities
-data |> 
+#all cities - fit logistic
+all_cities_fit_logistic = data |> 
   group_by(city_state) |>
   nest() |>
   mutate(models = map(data, \(df) glm(status ~ victim_age + victim_race + victim_sex, data = df, family = binomial())),
   results = map(models, broom::tidy,conf.int=TRUE)) |>
   select(-data, -models) |>
-  unnest(results)
+  unnest(results) |>
+  mutate(OR = exp(estimate)) |>
+  select(term, log_OR = estimate, OR, conf.low,conf.high,p.value) |>
+  filter(term == "victim_sexMale") 
+
+all_cities_fit_logistic |> #knitr::kable()
+  
 
 
   map(glm(status ~ victim_age + victim_race + victim_sex, data = _, family = binomial()) 
