@@ -25,15 +25,44 @@ data = read_csv("./data/homicide-data.csv", na=c("Unknown",".",""), ) |>
   mutate(victim_age = as.numeric(victim_age), 
          status = as.numeric(status))
 
-baltimore_data = data |>
-  filter(city_state == "Baltimore_MD") 
 ```
 
 ```{r}
+#baltimore logistic
+baltimore_data = data |>
+  filter(city_state == "Baltimore_MD") 
+
 fit_logistic =
   baltimore_data |>
   glm(status ~ victim_age + victim_race + victim_sex, data = _, family = binomial()) 
   
+fit_logistic |>
+  broom::tidy(conf.int=TRUE) |>
+  mutate(OR = exp(estimate)) |>
+  select(term, log_OR = estimate, OR, conf.low,conf.high,p.value) |>
+  filter(term == "victim_sexMale") #|>
+
+```
+
+```{r}
+#all cities
+data |> 
+  group_by(city_state) |>
+  nest()
+  map(glm(status ~ victim_age + victim_race + victim_sex, data = _, family = binomial()) 
+  
+
+
+#all cities prop test
+prop_results_all_cities = summary_data |>
+  mutate(prop_test_out_all = map2(unsolved_homicides,total_number_of_homicides, \(x,y) prop.test(x,y)),
+         tidy_df = map(prop_test_out_all,tidy))|>
+  unnest(tidy_df) |>
+  select(city_state,estimate,conf.low,conf.high)
+```
+
+
+```{r}
 fit_logistic_ci = as_tibble(confint(fit_logistic, level = 0.95), rownames="term")
 
 fit_logistic_all = fit_logistic |>
@@ -47,13 +76,7 @@ fit_logistic_all |>
   filter(term == "victim_sexMale") #|>
   #knitr::kable()
 
-fit_logistic |>
-  broom::tidy(conf.int=TRUE) |>
-  mutate(OR = exp(estimate)) |>
-  select(term, log_OR = estimate, OR, conf.low,conf.high p.value) |>
-  filter(term == "victim_sexMale") #|>
 ```
-
 
 ```{r}
 baltimore_df =
