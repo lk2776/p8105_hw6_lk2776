@@ -144,7 +144,7 @@ bwt_data = bwt_data |>
 bwt_data |> 
   ggplot(aes(x = pred, y = resid)) +
   geom_point() +
-  geom_smooth(method = "loess", se = FALSE,color="red" ) #methods 1
+  geom_smooth(method = "loess", se = FALSE,color="red" )+
   labs(
     title = "Predictions vs Residuals",
     x = "Predictions",
