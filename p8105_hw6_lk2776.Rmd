@@ -56,12 +56,34 @@ fit_logistic =
   baltimore_data |>
   glm(status ~ victim_age + victim_race + victim_sex, data = _, family = binomial()) |>
   broom::tidy(conf.int=TRUE) |>
-  mutate(OR = exp(estimate)) |>
-  select(term, log_OR = estimate, OR, conf.low,conf.high,p.value) |>
+  mutate(log_OR = exp(estimate),
+         conf.low = exp(conf.low),
+         conf.high = exp(conf.high)) |>
+  select(term, OR = estimate, log_OR, conf.low,conf.high,p.value) |>
   filter(term == "victim_sexMale")
   
 #fit_logistic |> knitr::kable()
 
+```
+
+
+```{r}
+#all cities - fit logistic
+all_cities_fit_logistic = data |> 
+  group_by(city_state) |>
+  nest() |>
+  mutate(models = map(data, \(df) glm(status ~ victim_age + victim_race + victim_sex, data = df, family = binomial())),
+  results = map(models, broom::tidy,conf.int=TRUE)) |>
+  select(-data, -models) |>
+  unnest(results) |>
+  mutate(log_OR = exp(estimate),
+         conf.low = exp(conf.low),
+         conf.high = exp(conf.high)) |>
+  select(term, OR = estimate, log_OR, conf.low,conf.high,p.value) |>
+  filter(term == "victim_sexMale") 
+
+#all_cities_fit_logistic |> knitr::kable()
+  
 ```
 
 The below plot shows 
@@ -81,22 +103,6 @@ ggplot(aes(x= reorder(city_state,log_OR), y = log_OR)) +
   
 ```
 
-```{r}
-#all cities - fit logistic
-all_cities_fit_logistic = data |> 
-  group_by(city_state) |>
-  nest() |>
-  mutate(models = map(data, \(df) glm(status ~ victim_age + victim_race + victim_sex, data = df, family = binomial())),
-  results = map(models, broom::tidy,conf.int=TRUE)) |>
-  select(-data, -models) |>
-  unnest(results) |>
-  mutate(OR = exp(estimate)) |>
-  select(term, log_OR = estimate, OR, conf.low,conf.high,p.value) |>
-  filter(term == "victim_sexMale") 
-
-#all_cities_fit_logistic |> knitr::kable()
-  
-```
 
 
 ```{r}
