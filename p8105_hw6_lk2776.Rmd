@@ -46,6 +46,12 @@ fit_logistic_all |>
   select(term, log_OR = estimate, OR, `2.5 %`,`97.5 %`, p.value) |>
   filter(term == "victim_sexMale") #|>
   #knitr::kable()
+
+fit_logistic |>
+  broom::tidy(conf.int=TRUE) |>
+  mutate(OR = exp(estimate)) |>
+  select(term, log_OR = estimate, OR, conf.low,conf.high p.value) |>
+  filter(term == "victim_sexMale") #|>
 ```
 
 
