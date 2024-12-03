@@ -49,6 +49,7 @@ bwt_data = read_csv("./data/birthweight.csv", na=c(" ",".","")) |>
 
 ```{r}
 #these variables seem reasonable to predict bwt
+#lm model hypothesized
 lm_model = lm(bwt ~ babysex + bhead + blength + delwt + fincome + frace + gaweeks + malform +
               mrace + pnumlbw + smoken + wtgain, data = bwt_data)
 
