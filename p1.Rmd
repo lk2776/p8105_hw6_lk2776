@@ -55,9 +55,33 @@ Y"),
 boot_strap_results = weather_df |> 
   modelr::bootstrap(n = 5000) |>
   mutate(
-    models = map(strap, \(df) lm(tmax ~ tmin, data = df) ),
-    results = map(models, )) |>
-  )
+    models = map(strap, \(df) lm(tmax ~ tmin, data = df)),
+   results = map(models, ~ {glance_v = broom::glance(.x) 
+      tidy_v = broom::tidy(.x) |>
+        filter(term != "(Intercept)") |>
+        pull(estimate)
+      logb0_logb1 = log(tidy_v[1] * tidy_v[2])  
+      tibble(
+        r_squared = glance_v$r.squared,
+        logb0_logb1 = logb0_logb1
+      )})) |>
+  select(results) |>
+  unnest(results)
+
+ggplot(bootstrap_results, aes(x = r_squared)) +
+  geom_density() +
+  labs(title = "r^2 distribution",
+       x = "r^2", 
+       y = "density") 
+
+conf_intervals = bootstrap_results |>
+  summarize(rsqured_ci = quantile(r_squared, probs = c(0.025, 0.975))#,
+    #logb0_logb1_ci = quantile(logb0_logb1, probs = c(0.025, 0.975))
+  ) |>
+  knitr::kable()
+
+
+
 ```
 
 sim_df_nonconst |>
