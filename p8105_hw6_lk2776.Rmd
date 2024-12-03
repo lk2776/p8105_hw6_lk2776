@@ -56,16 +56,15 @@ fit_logistic =
   baltimore_data |>
   glm(status ~ victim_age + victim_race + victim_sex, data = _, family = binomial()) |>
   broom::tidy(conf.int=TRUE) |>
-  mutate(log_OR = exp(estimate),
+  mutate(OR = exp(estimate),
          conf.low = exp(conf.low),
          conf.high = exp(conf.high)) |>
-  select(term, OR = estimate, log_OR, conf.low,conf.high,p.value) |>
+  select(term, log_OR = estimate, OR, conf.low,conf.high,p.value) |>
   filter(term == "victim_sexMale")
   
 #fit_logistic |> knitr::kable()
 
 ```
-
 
 ```{r}
 #all cities - fit logistic
@@ -76,10 +75,10 @@ all_cities_fit_logistic = data |>
   results = map(models, broom::tidy,conf.int=TRUE)) |>
   select(-data, -models) |>
   unnest(results) |>
-  mutate(log_OR = exp(estimate),
+  mutate(OR = exp(estimate),
          conf.low = exp(conf.low),
          conf.high = exp(conf.high)) |>
-  select(term, OR = estimate, log_OR, conf.low,conf.high,p.value) |>
+  select(term, log_OR = estimate, OR, conf.low,conf.high,p.value) |>
   filter(term == "victim_sexMale") 
 
 #all_cities_fit_logistic |> knitr::kable()
@@ -103,69 +102,4 @@ ggplot(aes(x= reorder(city_state,log_OR), y = log_OR)) +
   
 ```
 
-
-
-```{r}
-
-
-  map(glm(status ~ victim_age + victim_race + victim_sex, data = _, family = binomial()) 
-      
-      results = map(models, broom::tidy)) |>
-  select(-data, -models) |>
-  
-models = map(data, \(df) lm(price ~ stars + room_
-type, data = df)),
-
-#all cities prop test
-prop_results_all_cities = summary_data |>
-  mutate(prop_test_out_all = map2(unsolved_homicides,total_number_of_homicides, \(x,y) prop.test(x,y)),
-         tidy_df = map(prop_test_out_all,tidy))|>
-  unnest(tidy_df) |>
-  select(city_state,estimate,conf.low,conf.high)
-```
-
-
-```{r}
-fit_logistic_ci = as_tibble(confint(fit_logistic, level = 0.95), rownames="term")
-
-fit_logistic_all = fit_logistic |>
-  broom::tidy() |> 
-  left_join(fit_logistic_ci, by = "term")
-
-fit_logistic_all |>
-  #broom::tidy() |>
-  mutate(OR = exp(estimate)) |>
-  select(term, log_OR = estimate, OR, `2.5 %`,`97.5 %`, p.value) |>
-  filter(term == "victim_sexMale") #|>
-  #knitr::kable()
-
-```
-
-
-
-```{r}
-baltimore_df =
-  read_csv("data/homicide-data.csv") |>
-  filter(city == "Baltimore") |>
-  mutate(
-    resolved = as.numeric(disposition == "Closed by a
-rrest"),
-    victim_age = as.numeric(victim_age),
-    victim_race = fct_relevel(victim_race, "White")) |> 
-  select(resolved, victim_age, victim_race, victim_sex)
-
-fit_logistic =
-  baltimore_df |>
-  glm(resolved ~ victim_age + victim_race + victim_sex, data = _, family = binomial())
-
-fit_logistic |>
-  broom::tidy() |>
-  mutate(OR = exp(estimate)) |>
-  select(term, log_OR = estimate, OR, p.value) |>
-  knitr::kable(digits = 3)
-
-baltimore_df |>
-  modelr::add_predictions(fit_logistic) |>
-  mutate(fitted_prob = boot::inv.logit(pred))
-```
 
