@@ -200,5 +200,58 @@ cv_df |>
   labs(title = "RMSE across Models", x = "Model", y = "RMSE")
 ```
 
+## problem1
+
+
+```{r}
+weather_df =
+  rnoaa::meteo_pull_monitors(
+    c("USW00094728"),
+    var = c("PRCP", "TMIN", "TMAX"),
+    date_min = "2017-01-01",
+    date_max = "2017-12-31") %>%
+  mutate(
+    name = recode(id, USW00094728 = "CentralPark_N
+Y"),
+    tmin = tmin / 10,
+    tmax = tmax / 10) %>%
+  select(name, id, everything())
+
+
+```
+
+```{r}
+boot_strap_results = weather_df |> 
+  modelr::bootstrap(n = 5000) |>
+  mutate(
+    models = map(strap, \(df) lm(tmax ~ tmin, data = df)),
+   results = map(models, \(model) {glance_v = broom::glance(model) 
+      tidy_v = broom::tidy(model) |>
+        filter(term != "(Intercept)") |>
+        pull(estimate)
+      logb0_logb1 = log(tidy_v[1] * tidy_v[2])  
+      tibble(
+        r_squared = glance_v$r.squared,
+        logb0_logb1 = logb0_logb1
+      )})) |>
+  select(results) |>
+  unnest(results)
+```
+
+
+```{r}
+boot_strap_results |>
+  ggplot(aes(x = r_squared)) +
+  geom_density() +
+  labs(title = "r^2 distribution",
+       x = "r^2", 
+       y = "density") 
+
+conf_intervals = boot_strap_results |>
+  summarize(rsqured_ci = quantile(r_squared, probs = c(0.025, 0.975))
+  ) 
+conf_intervals
+
+```
 
 
