@@ -64,12 +64,17 @@ bwt_data = bwt_data |>
 
 bwt_data |> 
   ggplot(aes(x = pred, y = resid)) +
-  geom_point()
+  geom_point() +
+  labs(
+    title = "Predictions vs Residuals",
+    x = "Predictions",
+    y = "Residuals"
+  ) 
 
 
-full_model_1 |> 
-  broom::tidy() |>
-  select(term, estimate, p.value) 
+#full_model_1 |> 
+#  broom::tidy() |>
+#  select(term, estimate, p.value) 
 
 
 fit_null = lm(price ~ stars + borough, data = nyc_air
