@@ -48,10 +48,7 @@ Y"),
     tmin = tmin / 10,
     tmax = tmax / 10) %>%
   select(name, id, everything())
-```
 
-
-```{r}
 boot_strap_results = weather_df |> 
   modelr::bootstrap(n = 5000) |>
   mutate(
@@ -75,36 +72,8 @@ ggplot(bootstrap_results, aes(x = r_squared)) +
        y = "density") 
 
 conf_intervals = bootstrap_results |>
-  summarize(rsqured_ci = quantile(r_squared, probs = c(0.025, 0.975))#,
-    #logb0_logb1_ci = quantile(logb0_logb1, probs = c(0.025, 0.975))
-  ) |>
-  knitr::kable()
-
-
-
+  summarize(rsqured_ci = quantile(r_squared, probs = c(0.025, 0.975))
+  ) 
+conf_intervals
 ```
 
-sim_df_nonconst |>
-  modelr::bootstrap(n = 1000) |>
-  mutate(
-    models = map(strap, \(df) lm(y ~ x, data = df) ),
-    results = map(models, broom::tidy)) |>
-  select(-strap, -models) |>
-  unnest(results) |>
-  group_by(term) |>
-  summarize(boot_se = sd(estimate))
-  
-  
-
-
-nyc_airbnb |>
-  filter(borough == "Manhattan") |>
-  modelr::bootstrap(n = 1000) |>
-  mutate(
-    models = map(strap, \(df) lm(price ~ stars + room
-_type, data = df)),
-    results = map(models, broom::tidy)) |>
-  select(results) |>
-  unnest(results) |>
-  filter(term == "stars") |>
-  ggplot(aes(x = estimate)) + geom_density()

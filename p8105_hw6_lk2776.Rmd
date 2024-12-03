@@ -107,5 +107,98 @@ ggplot(aes(x= reorder(city_state,OR), y = OR)) +
   
 ```
 
-## problem 3
+## problem3 
+
+The modeling process for the initial analysis involves nesting models: Simple regression model is fitted using babysex, bhead, and blength as predictors. A full model, which includes additonal predictors, is then fitted, and the significance of the models using ANova. Since the anova values is less than 0.05, the full model explains more variation. Homoskedasticity, linearity and presence of outliers can be observed in the residulas vs fitted values plot. Two other models are compared with full model using cross validation. The RMSE for full models is lower than for the two other models, making it the preferred model. 
+
+
+```{r}
+bwt_data = read_csv("./data/birthweight.csv", na=c(" ",".","")) |>
+  janitor::clean_names() |>
+  drop_na() |>
+  mutate(
+    babysex = as.factor(babysex),
+    malform = as.factor(malform),
+    frace = as.factor(frace),
+    mrace = as.factor(mrace)
+  )
+#str(bwt_data)
+
+```
+
+```{r}
+#model 1
+#nested model process of selecting variables 
+simple_model_1 = lm(bwt ~ babysex + bhead + blength, data = bwt_data) #baby's variables
+
+full_model_1 = lm(bwt ~ babysex + bhead + blength+ delwt + fincome + frace + gaweeks + malform +
+              mrace + pnumlbw + smoken + wtgain, data = bwt_data) 
+
+anova(simple_model_1, full_model_1)|>
+  broom::tidy() #p-value less than 0.05 
+
+bwt_data = bwt_data |>
+  add_predictions(full_model_1) |> #pred
+  add_residuals(full_model_1) #resid
+
+bwt_data |> 
+  ggplot(aes(x = pred, y = resid)) +
+  geom_point() +
+  geom_smooth(method = "loess", se = FALSE,color="red" ) #methods 1
+  labs(
+    title = "Predictions vs Residuals",
+    x = "Predictions",
+    y = "Residuals"
+  ) 
+
+```
+
+```{r}
+#main effects
+model_2 = lm(bwt ~  blength + gaweeks, data = bwt_data)
+model_2 |> 
+  broom::tidy() |>
+  select(term, estimate, p.value) 
+
+#main effects + interactions
+model_3 = lm(bwt ~ bhead * blength * babysex, data = bwt_data)
+
+model_3 |> 
+  broom::tidy() |>
+  select(term, estimate, p.value) 
+```
+
+
+```{r}
+cv_df = crossv_mc(bwt_data, 100) |>
+  mutate(
+    train = map(train, as_tibble),
+    test = map(test, as_tibble))
+  
+cv_df =
+  cv_df |>
+  mutate(
+    full_model_1_b  = map(train, \(df) lm(bwt ~ babysex + bhead + blength+ delwt + fincome + frace + gaweeks + malform +
+              mrace + pnumlbw + smoken + wtgain, data = df)),
+    model_2_b  = map(train, \(df) lm(bwt ~  blength + gaweeks, data = df)),
+    model_3_b  = map(train, \(df) lm(bwt ~ bhead * blength * babysex, data = df))) |>
+  mutate(
+    rmse_full_model = map2_dbl(full_model_1_b, test, \(mod, df) rmse(model = mod, data = df)),
+    rmse_mode_l2 = map2_dbl(model_2_b, test, \(mod, df) rmse(model = mod, data = df)),
+    rmse_model_3 = map2_dbl(model_3_b, test, \(mod, df) rmse(model = mod, data = df)))
+
+
+cv_df |>
+  select(starts_with("rmse")) |>
+  pivot_longer(
+    everything(),
+    names_to = "model",
+    values_to = "rmse",
+    names_prefix = "rmse_") |>
+  mutate(model = fct_inorder(model)) |>
+  ggplot(aes(x = model, y = rmse)) + geom_violin() +
+  labs(title = "RMSE across Models", x = "Model", y = "RMSE")
+```
+
+
 
