@@ -49,8 +49,23 @@ bwt_data = read_csv("./data/birthweight.csv", na=c(" ",".","")) |>
 
 ```{r}
 #model 1
-model_1 = lm(bwt ~ babysex + bhead + blength + delwt + fincome + frace + gaweeks + malform +
-              mrace + pnumlbw + smoken + wtgain, data = bwt_data) |> 
+#nested model process of selecting variables 
+simple_model_1 = lm(bwt ~ babysex + bhead + blength, data = bwt_data) #baby's variables
+
+full_model_1 = lm(bwt ~ babysex + bhead + blength+ delwt + fincome + frace + gaweeks + malform +
+              mrace + pnumlbw + smoken + wtgain, data = bwt_data) 
+
+anova(simple_model_1, full_model_1)|>
+  broom::tidy() #p-value less than 0.05 
+
+
+bwt_data = bwt_data |>
+  add_predictions(full_model_1) |>
+  add_residuals(full_model_1)
+
+
+
+full_model_1 |> 
   broom::tidy() |>
   select(term, estimate, p.value) 
 
