@@ -71,62 +71,20 @@ bwt_data |>
     y = "Residuals"
   ) 
 
+```
 
-#full_model_1 |> 
-#  broom::tidy() |>
-#  select(term, estimate, p.value) 
-
-
-fit_null = lm(price ~ stars + borough, data = nyc_air
-bnb)
-fit_alt = lm(price ~ stars + borough + room_type, dat
-a = nyc_airbnb)
-
-anova(fit_null, fit_alt) |>
-  broom::tidy()
-bwt_data = bwt_data |>
-add_predictions(model_1) |>
-  add_residuals(model_1)
-
-model_1 |> 
-  broom::tidy() |>
-  select(term, estimate, p.value) 
-  
-
-
-
-model_1_b = modelr::add_predictions(bwt_data, model_1) 
-model_1_c = modelr::add_residuals(bwt_data, model_1)
-
-
-
-
+```{r}
+#main effects
 model_2 = lm(bwt ~  blength + gaweeks, data = bwt_data)
 model_2 |> 
   broom::tidy() |>
   select(term, estimate, p.value) 
 
+#main effects + interactions
 model_3 = lm(bwt ~ bhead * blength * babysex, data = bwt_data)
 
 model_3 |> 
   broom::tidy() |>
   select(term, estimate, p.value) 
-
-
-  modelr::add_predictions(nyc_airbnb, fit)
-  modelr::add_residuals(nyc_airbnb, fit)
-  
-  nyc_airbnb |>
-  modelr::add_residuals(fit) |>
-  ggplot(aes(x = borough, y = resid)) + geom_violin()
-  
-  nyc_airbnb |>
-  modelr::add_residuals(fit) |>
-  ggplot(aes(x = stars, y = resid)) + geom_point()
-  
-  
-  mutate(term = str_replace(term, "^borough", "Boroug
-h: ")) |>
-  knitr::kable(digits = 3)
 ```
 
