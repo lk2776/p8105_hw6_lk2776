@@ -48,10 +48,14 @@ fit_logistic |>
 #all cities
 data |> 
   group_by(city_state) |>
-  nest()
+  nest() |>
+  mutate(fit_logistic_all_cities = map(data, \(df) glm(status ~ victim_age + victim_race + victim_sex, data = df, family = binomial())))
+
+
   map(glm(status ~ victim_age + victim_race + victim_sex, data = _, family = binomial()) 
   
-
+models = map(data, \(df) lm(price ~ stars + room_
+type, data = df)),
 
 #all cities prop test
 prop_results_all_cities = summary_data |>
