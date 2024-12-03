@@ -50,12 +50,25 @@ bwt_data = read_csv("./data/birthweight.csv", na=c(" ",".","")) |>
 ```{r}
 #model 1
 model_1 = lm(bwt ~ babysex + bhead + blength + delwt + fincome + frace + gaweeks + malform +
-              mrace + pnumlbw + smoken + wtgain, data = bwt_data)
+              mrace + pnumlbw + smoken + wtgain, data = bwt_data) |> 
+  broom::tidy() |>
+  select(term, estimate, p.value) 
+
+
 model_1 |> 
   broom::tidy() |>
   select(term, estimate, p.value) 
   
-model_2 = lm(bwt ~  blength + gaweeks, data = bwt_data, data = bwt_data)
+
+
+
+model_1_b = modelr::add_predictions(bwt_data, model_1) 
+model_1_c = modelr::add_residuals(bwt_data, model_1)
+
+
+
+
+model_2 = lm(bwt ~  blength + gaweeks, data = bwt_data)
 model_2 |> 
   broom::tidy() |>
   select(term, estimate, p.value) 
