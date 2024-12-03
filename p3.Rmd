@@ -58,11 +58,13 @@ full_model_1 = lm(bwt ~ babysex + bhead + blength+ delwt + fincome + frace + gaw
 anova(simple_model_1, full_model_1)|>
   broom::tidy() #p-value less than 0.05 
 
-
 bwt_data = bwt_data |>
-  add_predictions(full_model_1) |>
-  add_residuals(full_model_1)
+  add_predictions(full_model_1) |> #pred
+  add_residuals(full_model_1) #resid
 
+bwt_data |> 
+  ggplot(aes(x = pred, y = resid)) +
+  geom_point()
 
 
 full_model_1 |> 
