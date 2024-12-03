@@ -14,6 +14,8 @@ library(SemiPar)
 library(ggridges)
 library(patchwork)
 library(forcats)
+library(modelr) 
+library(mgcv)
 
 #R figure settings
 knitr::opts_chunk$set(
@@ -90,7 +92,29 @@ model_3 |>
 
 
 ```{r}
+cv_df = crossv_mc(bwt_data, 5)
+cv_df =
+  cv_df |>
+  mutate(
+    full_model_1_b  = map(train, \(df) lm(bwt ~ babysex + bhead + blength+ delwt + fincome + frace + gaweeks + malform +
+              mrace + pnumlbw + smoken + wtgain, data = df)),
+    model_2_b  = map(train, \(df) lm(bwt ~  blength + gaweeks, data = df)),
+    model_3_b  = map(train, \(df) lm(bwt ~ bhead * blength * babysex, data = df))) |>
+  mutate(
+    rmse_full_model = map2_dbl(full_model_1_b, test, \(mod, df) rmse(model = mod, data = df)),
+    rmse_mode_l2 = map2_dbl(model_2_b, test, \(mod, df) rmse(model = mod, data = df)),
+    rmse_model_3 = map2_dbl(model_3_b, test, \(mod, df) rmse(model = mod, data = df)))
 
+
+cv_df |>
+  select(starts_with("rmse")) |>
+  pivot_longer(
+    everything(),
+    names_to = "model",
+    values_to = "rmse",
+    names_prefix = "rmse_") |>
+  mutate(model = fct_inorder(model)) |>
+  ggplot(aes(x = model, y = rmse)) + geom_violin()
 ```
 
 
