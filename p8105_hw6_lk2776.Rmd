@@ -89,15 +89,16 @@ The below plot shows
 ```{r}
 
 all_cities_fit_logistic |>
- # mutate(city_state = fct_reorder(city_state,log_OR)) |> #not working
-ggplot(aes(x= reorder(city_state,log_OR), y = log_OR)) + 
+ # mutate(city_state = fct_reorder(city_state,OR)) |> #not working
+ggplot(aes(x= reorder(city_state,OR), y = OR)) + 
   geom_point() +
   theme(axis.text.x = element_text(angle = 80, hjust
 = 1))+
+  geom_errorbar(aes(ymin=conf.low, ymax = conf.high), color = "orange") +
   labs(
-    title = "Log OR across Cities, States",
+    title = "OR across Cities, States",
     x = "City, State",
-    y = "Log OR"
+    y = "OR"
   )
   
 ```
