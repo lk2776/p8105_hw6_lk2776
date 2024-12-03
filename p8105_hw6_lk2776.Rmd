@@ -66,7 +66,12 @@ fit_logistic =
 ggplot(all_cities_fit_logistic, aes(x= city_state, y = log_OR)) + 
   geom_point() +
   theme(axis.text.x = element_text(angle = 80, hjust
-= 1))
+= 1))+
+  labs(
+    title = "Log OR across Cities, States"
+    x = "Log OR"
+    y = "city_state"
+  )
   
 ```
 
