@@ -53,6 +53,11 @@ Y"),
 
 ```{r}
 boot_strap_results = weather_df |> 
+  modelr::bootstrap(n = 5000) |>
+  mutate(
+    models = map(strap, \(df) lm(tmax ~ tmin, data = df) ),
+    results = map(models, )) |>
+  )
 ```
 
 sim_df_nonconst |>
