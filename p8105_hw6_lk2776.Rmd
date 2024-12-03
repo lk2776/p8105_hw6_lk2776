@@ -11,6 +11,9 @@ library(p8105.datasets)
 library(modelr)
 library(mgcv)
 library(SemiPar)
+library(ggridges)
+library(patchwork)
+library(forcats)
 
 #R figure settings
 knitr::opts_chunk$set(
@@ -61,16 +64,19 @@ fit_logistic =
 
 ```
 
-
+The below plot shows 
 ```{r}
-ggplot(all_cities_fit_logistic, aes(x= city_state, y = log_OR)) + 
+
+all_cities_fit_logistic |>
+ # mutate(city_state = fct_reorder(city_state,log_OR)) |> #not working
+ggplot(aes(x= reorder(city_state,log_OR), y = log_OR)) + 
   geom_point() +
   theme(axis.text.x = element_text(angle = 80, hjust
 = 1))+
   labs(
-    title = "Log OR across Cities, States"
-    x = "Log OR"
-    y = "city_state"
+    title = "Log OR across Cities, States",
+    x = "City, State",
+    y = "Log OR"
   )
   
 ```
