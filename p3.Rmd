@@ -48,12 +48,37 @@ bwt_data = read_csv("./data/birthweight.csv", na=c(" ",".","")) |>
 ```
 
 ```{r}
-#these variables seem reasonable to predict bwt
-#lm model hypothesized
-lm_model = lm(bwt ~ babysex + bhead + blength + delwt + fincome + frace + gaweeks + malform +
+#model 1
+model_1 = lm(bwt ~ babysex + bhead + blength + delwt + fincome + frace + gaweeks + malform +
               mrace + pnumlbw + smoken + wtgain, data = bwt_data)
+model_1 |> 
+  broom::tidy() |>
+  select(term, estimate, p.value) 
+  
+model_2 = lm(bwt ~  blength + gaweeks, data = bwt_data, data = bwt_data)
+model_2 |> 
+  broom::tidy() |>
+  select(term, estimate, p.value) 
 
-lm_model |> broom::tidy() |>select(term, estimate, p.value) |>
+model_3 = lm(bwt ~ bhead * blength * babysex, data = bwt_data)
+
+model_3 |> 
+  broom::tidy() |>
+  select(term, estimate, p.value) 
+
+
+  modelr::add_predictions(nyc_airbnb, fit)
+  modelr::add_residuals(nyc_airbnb, fit)
+  
+  nyc_airbnb |>
+  modelr::add_residuals(fit) |>
+  ggplot(aes(x = borough, y = resid)) + geom_violin()
+  
+  nyc_airbnb |>
+  modelr::add_residuals(fit) |>
+  ggplot(aes(x = stars, y = resid)) + geom_point()
+  
+  
   mutate(term = str_replace(term, "^borough", "Boroug
 h: ")) |>
   knitr::kable(digits = 3)
