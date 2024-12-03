@@ -14,6 +14,8 @@ library(SemiPar)
 library(ggridges)
 library(patchwork)
 library(forcats)
+library(modelr) 
+library(mgcv)
 
 #R figure settings
 knitr::opts_chunk$set(
