@@ -4,6 +4,37 @@ output: html_document
 date: "2024-12-03"
 ---
 
+```{r include=FALSE, message=FALSE}
+library(tidyverse)
+library(ggplot2)
+library(p8105.datasets)
+library(modelr)
+library(mgcv)
+library(SemiPar)
+library(ggridges)
+library(patchwork)
+library(forcats)
+library(modelr) 
+library(mgcv)
+
+#R figure settings
+knitr::opts_chunk$set(
+  fig.width = 9,
+  fig.asp = .6,
+  out.width = "90%"
+)
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
+```
+
+
 ```{r}
 weather_df =
   rnoaa::meteo_pull_monitors(
@@ -19,3 +50,32 @@ Y"),
   select(name, id, everything())
 ```
 
+
+```{r}
+boot_strap_results = weather_df |> 
+```
+
+sim_df_nonconst |>
+  modelr::bootstrap(n = 1000) |>
+  mutate(
+    models = map(strap, \(df) lm(y ~ x, data = df) ),
+    results = map(models, broom::tidy)) |>
+  select(-strap, -models) |>
+  unnest(results) |>
+  group_by(term) |>
+  summarize(boot_se = sd(estimate))
+  
+  
+
+
+nyc_airbnb |>
+  filter(borough == "Manhattan") |>
+  modelr::bootstrap(n = 1000) |>
+  mutate(
+    models = map(strap, \(df) lm(price ~ stars + room
+_type, data = df)),
+    results = map(models, broom::tidy)) |>
+  select(results) |>
+  unnest(results) |>
+  filter(term == "stars") |>
+  ggplot(aes(x = estimate)) + geom_density()

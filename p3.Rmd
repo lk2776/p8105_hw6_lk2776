@@ -33,11 +33,7 @@ options(
 scale_colour_discrete = scale_colour_viridis_d
 scale_fill_discrete = scale_fill_viridis_d
 ```
-Propose a regression model for birthweight. This model may be based on a hypothesized structure for the factors that underly birthweight, on a data- driven model-building process, or a combination of the two. Describe your modeling process and show a plot of model residuals against fitted values – use add_predictions and add_residuals in making this plot.
-Compare your model to two others:
-One using length at birth and gestational age as predictors (main e#ects only)
-One using head circumference, length, sex, and all interactions (including the three-way interaction) between these
-Make this comparison in terms of the cross-validated prediction error; use crossv_mc and functions in purrr as appropriate.
+## problem3 
 
 The modeling process for the initial involves nesting models: Simple regression model is fit with babysex, bhead, blength. Full model including more predictiors is fit and the signifcance of the these models is tested using anova. Anova value is less than 0.05, and therefore full model explains more variation. Homoskedasticity, linearity and presence of outliers can be observed in the residulas vs fitted values plot. 
 Two other models are compared with full model using cross validation method. RMSE for full models is lower than the two other models and therefore it is preferred. 
