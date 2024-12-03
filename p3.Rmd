@@ -39,16 +39,22 @@ bwt_data = read_csv("./data/birthweight.csv", na=c(" ",".","")) |>
   drop_na() |>
   mutate(
     babysex = as.factor(babysex),
-    malform = as.factor(malform)
+    malform = as.factor(malform),
     frace = as.factor(frace),
-    mrace = as.factor(frace)
+    mrace = as.factor(mrace)
   )
 #str(bwt_data)
 
 ```
 
 ```{r}
-lm_model = lm(bwt ~ babysex + bhead + blength + delwt + fincome + frace + gaweeks + malform
-              mrace + smoken)
+#these variables seem reasonable to predict bwt
+lm_model = lm(bwt ~ babysex + bhead + blength + delwt + fincome + frace + gaweeks + malform +
+              mrace + pnumlbw + smoken + wtgain, data = bwt_data)
+
+lm_model |> broom::tidy() |>select(term, estimate, p.value) |>
+  mutate(term = str_replace(term, "^borough", "Boroug
+h: ")) |>
+  knitr::kable(digits = 3)
 ```
 
