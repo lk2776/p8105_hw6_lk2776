@@ -32,6 +32,8 @@ scale_colour_discrete = scale_colour_viridis_d
 scale_fill_discrete = scale_fill_viridis_d
 ```
 
+
+## problem 2
 ```{r}
 #problem2
 data = read_csv("./data/homicide-data.csv", na=c("Unknown",".",""), ) |>
@@ -103,4 +105,5 @@ ggplot(aes(x= reorder(city_state,OR), y = OR)) +
   
 ```
 
+## problem 3
 
